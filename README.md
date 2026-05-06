@@ -1,66 +1,83 @@
-## Foundry
+# Foundry FundMe
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A decentralized crowdfunding protocol built with Foundry. This project allows users to fund a contract with ETH based on a minimum USD value, and allows the owner to withdraw the funds.
 
-Foundry consists of:
+## Features
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- **Decentralized Funding**: Anyone can fund the contract with a minimum of $5 USD worth of ETH.
+- **Chainlink Price Feeds**: Uses Chainlink Oracles to get real-time ETH/USD price data.
+- **Multi-Network Support**: Seamlessly deploy to Anvil (local), Sepolia (testnet), or Mainnet using `HelperConfig`.
+- **Gas Optimized**: Implements `cheaperWithdraw` pattern to minimize storage reads and save gas.
+- **Robust Testing**: Comprehensive unit tests covering funding, security, and withdrawals.
 
-## Documentation
+## Getting Started
 
-https://book.getfoundry.sh/
+### Prerequisites
+
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Foundry](https://getfoundry.sh/)
+
+### Installation
+
+```bash
+git clone https://github.com/YOUR_USERNAME/foundry-FundMe
+cd foundry-FundMe
+forge install
+forge build
+```
 
 ## Usage
 
-### Build
+### Testing
 
-```shell
-$ forge build
+Run the full test suite:
+```bash
+forge test
 ```
 
-### Test
-
-```shell
-$ forge test
+For more detailed traces:
+```bash
+forge test -vvv
 ```
 
-### Format
+### Deployment
 
-```shell
-$ forge fmt
+#### Local (Anvil)
+```bash
+# Start anvil in a separate terminal
+anvil
+
+# Deploy
+forge script script/DeployFundMe.s.sol:DeployFundMe --rpc-url http://127.0.0.1:8545 --broadcast --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 ```
 
-### Gas Snapshots
-
-```shell
-$ forge snapshot
+#### Testnet (Sepolia)
+Make sure you have an `.env` file with `SEPOLIA_RPC_URL` and `PRIVATE_KEY`.
+```bash
+source .env
+forge script script/DeployFundMe.s.sol:DeployFundMe --rpc-url $SEPOLIA_RPC_URL --broadcast --private-key $PRIVATE_KEY --verify --etherscan-api-key $ETHERSCAN_API_KEY
 ```
 
-### Anvil
+## Project Structure
 
-```shell
-$ anvil
-```
+- `src/`: Core smart contracts (`FundMe.sol`, `PriceConverter.sol`).
+- `script/`: Deployment and configuration scripts (`DeployFundMe.s.sol`, `HelperConfig.s.sol`).
+- `test/`: Unit tests (`FundMe.t.sol`).
+- `lib/`: External dependencies (Chainlink, Forge Standard Library).
 
-### Deploy
+## Professional Patterns Applied
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+- **Naming Conventions**: 
+    - `s_` for storage variables.
+    - `i_` for immutable variables.
+    - `FundMe__` prefix for custom errors.
+- **Gas Optimization**: Memory arrays used in `cheaperWithdraw` to reduce SLOAD operations.
+- **Multi-Chain Orchestration**: `HelperConfig` abstracts network-specific parameters (Price Feed addresses) and handles mock deployments for local testing.
 
-### Cast
+## Acknowledgments
 
-```shell
-$ cast <subcommand>
-```
+Inspired by the Cyfrin / Patrick Collins Foundry Course.
 
-### Help
+## License
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+MIT
